@@ -14,6 +14,6 @@ class Channel:
         self.clients: Set = set()
         self.dict_clients: Dict = {}
 
-    def add_client(self, client: Type[BaseClient]) -> None:
+    def add_client(self, client: BaseClient) -> None:
         self.clients.add(client)
         self.dict_clients[client.client_id] = client

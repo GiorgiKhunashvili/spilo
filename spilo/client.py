@@ -6,7 +6,10 @@ from dataclasses import dataclass
 @dataclass(kw_only=True)
 class BaseClient(ABC):
 
-    client_id: str = uuid.uuid4()
+    client_id: uuid.UUID = uuid.uuid4()
+
+    def __hash__(self):
+        return self.client_id.int
     
     @abstractmethod
     async def send(self, data: bytes | str):
