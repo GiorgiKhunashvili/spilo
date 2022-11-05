@@ -18,10 +18,11 @@ def test_channel_instance():
 
 
 def test_adding_new_client_in_channel():
-    client = Client()
+    client_1 = Client()
     channel = Channel("test_channel")
-    channel.add_client(client)
+    channel.add_client(client_1)
 
     assert len(channel.clients) == 1
     for client in channel.clients:
-        assert client == client
+        assert client is client_1
+
