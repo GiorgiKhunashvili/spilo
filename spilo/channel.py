@@ -1,6 +1,6 @@
 from typing import Set, Dict
 
-from .client import BaseClient
+from .base_client import BaseClient
 
 
 class Channel:
@@ -20,7 +20,7 @@ class Channel:
         """
         self.clients.add(client)
         self.dict_clients[client.client_id] = client
-    
+
     async def remove_client(self, client: BaseClient):
         """
         Method for removing client from channel.
