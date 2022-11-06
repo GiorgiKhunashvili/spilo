@@ -1,4 +1,4 @@
-from typing import Set, Dict, Type
+from typing import Set, Dict
 
 from .client import BaseClient
 
@@ -15,5 +15,18 @@ class Channel:
         self.dict_clients: Dict = {}
 
     def add_client(self, client: BaseClient) -> None:
+        """
+        Method for adding ws clients to channel.
+        """
         self.clients.add(client)
         self.dict_clients[client.client_id] = client
+    
+    async def remove_client(self, client: BaseClient):
+        """
+        Method for removing client from channel.
+        """
+        if client in self.clients:
+            await client.close()
+            self.clients.remove(client)
+            self.dict_clients.pop(client.client_id, None)
+

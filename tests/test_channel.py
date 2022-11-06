@@ -1,3 +1,4 @@
+import pytest
 from spilo.channel import Channel
 from spilo.client import BaseClient
 
@@ -25,4 +26,15 @@ def test_adding_new_client_in_channel():
     assert len(channel.clients) == 1
     for client in channel.clients:
         assert client is client_1
+
+
+@pytest.mark.asyncio
+async def test_remove_client_from_channel():
+    client = Client()
+    channel = Channel("test_channel")
+    channel.add_client(client)
+
+    await channel.remove_client(client)
+    assert len(channel.clients) == 0
+    assert channel.dict_clients.get(client.client_id) is None
 
