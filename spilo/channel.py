@@ -1,4 +1,4 @@
-from typing import Set, Dict, Any
+from typing import Set, Dict, Any, Tuple
 
 from .base_client import BaseClient
 from .base_pubsub import BasePubSub
@@ -8,13 +8,28 @@ class Channel:
     """
     Class for handling clients adding new clients, removing clients in one specific channel.
     :param channel_name: The channel name where clients|client will be subscribed.
-    clients will send and receive messages through channel_name
+    clients will send and receive messages through channel_name.
     """
+
+    channel_cache = {}
+
     def __init__(self, channel_name: str, pubsub_manager: BasePubSub):
         self.channel_name = channel_name
         self.clients: Set[BaseClient] = set()
         self.dict_clients: Dict[Any, BaseClient] = {}
         self.pubsub_manager = pubsub_manager
+
+    @classmethod
+    def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> Tuple["Channel", bool]:
+        """
+        Class method for getting channel class if channel class does not exists 
+        method will create new one and will return from fucntion.
+        """
+        if channel_name in cls.channel_cache:
+            return cls.channel_cache[channel_name], True
+        channel = cls(channel_name, pubsub_manager)
+        return channel, False
+
 
     def add_client(self, client: BaseClient) -> None:
         """
@@ -37,7 +52,7 @@ class Channel:
             if raw:
                 if raw["data"] == "STOP" and len(self.clients) == 0:
                     break
-                elif raw["channel"] != self.channel_name:
+                if raw["channel"] != self.channel_name:
                     try:
                         await self.dict_clients[raw["channel"]].send(
                             raw["data"]
@@ -48,3 +63,4 @@ class Channel:
                 else:
                     for client in self.clients:
                         await client.send(str(raw["data"]))
+
