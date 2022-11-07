@@ -9,7 +9,7 @@ DESCRIPTION = ""
 EMAIL = "gkhunashvili@icloud.com"
 AUTHOR = "Giorgi Khunashvili"
 REQUIRES_PYTHON = ">=3.6.0"
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 
 # Which packages are required for this module to be executed?
 REQUIRED = [
