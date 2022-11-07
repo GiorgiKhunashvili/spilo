@@ -63,3 +63,5 @@ class Channel:
                     for client in self.clients:
                         await client.send(str(raw["data"]))
 
+    async def publish(self, data):
+        await self.pubsub_manager.publish(self.channel_name, data)

@@ -10,8 +10,8 @@ from .base_pubsub import BasePubSub
 class RedisPubSub(BasePubSub):
 
     _singleton = None
-
-    def __new__(cls, *args, **kwargs):
+    
+    def __new__(cls, url="redis://localhost:6379/0", redis_options=None, *args, **kwargs):
         if not cls._singleton:
             cls._singleton = super(RedisPubSub, cls).__new__(cls, *args, **kwargs)
         return cls._singleton
@@ -30,7 +30,7 @@ class RedisPubSub(BasePubSub):
         return await self.redis.publish(
             channel_name, json.dumps(data)
         )
-    
+
     async def listen(self, channel_name: str):
         await self.pubsub.subscribe(channel_name)
         async for message in self.pubsub.listen():
