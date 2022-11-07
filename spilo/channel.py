@@ -22,14 +22,13 @@ class Channel:
     @classmethod
     def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> Tuple["Channel", bool]:
         """
-        Class method for getting channel class if channel class does not exists 
-        method will create new one and will return from fucntion.
+        Class method for getting channel class if channel class does not exist
+        method will create new one and will return from function.
         """
         if channel_name in cls.channel_cache:
             return cls.channel_cache[channel_name], True
         channel = cls(channel_name, pubsub_manager)
         return channel, False
-
 
     def add_client(self, client: BaseClient) -> None:
         """
