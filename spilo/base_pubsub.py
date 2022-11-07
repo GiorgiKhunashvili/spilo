@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import AsyncIterable
 
 
-class PubSub(ABC):
+class BasePubSub(ABC):
     """
     This is abstract base class defines interface
     which should be implemented by any child class.
@@ -13,16 +14,14 @@ class PubSub(ABC):
         Method for connecting pub sub backend.
         """
 
-
     @abstractmethod
-    async def publish(self, data):
+    async def publish(self, channel_name: str, data):
         """
         Method for publishing messages.
         """
 
-
     @abstractmethod
-    async def listen(self, data):
+    async def listen(self, channel_name: str) -> AsyncIterable:
         """
         Method for listening incoming messages.
         """
