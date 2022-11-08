@@ -28,6 +28,7 @@ class Channel:
         if channel_name in cls.channel_cache:
             return cls.channel_cache[channel_name], True
         channel = cls(channel_name, pubsub_manager)
+        cls.channel_cache[channel_name] = channel
         return channel, False
 
     def add_client(self, client: BaseClient) -> None:
@@ -47,7 +48,7 @@ class Channel:
             self.dict_clients.pop(client.client_id, None)
 
     async def receiver(self):
-        async for raw in await self.pubsub_manager.listen(self.channel_name):
+        async for raw in self.pubsub_manager.listen(self.channel_name):
             if raw:
                 if raw["data"] == "STOP" and len(self.clients) == 0:
                     break

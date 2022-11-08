@@ -23,7 +23,7 @@ class RedisPubSub(BasePubSub):
         self.pubsub: PubSub | None = None
 
     def connect(self):
-        self.redis = aioredis.Redis.from_url(self.redis_url, **self.redis_options)
+        self.redis = aioredis.Redis.from_url(self.redis_url, decode_responses=True, **self.redis_options)
         self.pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
 
     async def publish(self, channel_name: str, data):
