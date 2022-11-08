@@ -18,7 +18,7 @@ class RedisPubSub(BasePubSub):
 
     def __init__(self, url="redis://localhost:6379/0", redis_options=None):
         self.redis_url = url
-        self.redis_options = redis_options
+        self.redis_options = redis_options or {}
         self.redis: Redis | None = None
         self.pubsub: PubSub | None = None
 
