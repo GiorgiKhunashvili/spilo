@@ -66,18 +66,17 @@ class Channel:
         and sending messeges to channel clients.
         """
         async for raw in self.pubsub_manager.listen(self.channel_name):
-            if raw:
-                if raw["channel"] != self.channel_name:
-                    try:
-                        await self.dict_clients[raw["channel"]].send(
-                            raw["data"]
-                        )
-                    except KeyError:
-                        # TODO LOG SOMETHING
-                        pass
-                else:
-                    for client in self.clients:
-                        await client.send(str(raw["data"]))
+            if raw["channel"] != self.channel_name:
+                try:
+                    await self.dict_clients[raw["channel"]].send(
+                        raw["data"]
+                    )
+                except KeyError:
+                    # TODO LOG SOMETHING
+                    pass
+            else:
+                for client in self.clients:
+                    await client.send(str(raw["data"]))
 
     async def publish(self, data):
         """
