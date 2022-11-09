@@ -48,6 +48,10 @@ class Channel:
             self.dict_clients.pop(client.client_id, None)
 
     async def receiver(self):
+        """
+        Method for listening pubsub backend channel 
+        and sending messeges to channel clients.
+        """
         async for raw in self.pubsub_manager.listen(self.channel_name):
             if raw:
                 if raw["data"] == "STOP" and len(self.clients) == 0:
@@ -65,4 +69,7 @@ class Channel:
                         await client.send(str(raw["data"]))
 
     async def publish(self, data):
+        """
+        Method for publishing messages to the specific channel.
+        """
         await self.pubsub_manager.publish(self.channel_name, data)

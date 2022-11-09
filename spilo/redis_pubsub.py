@@ -34,6 +34,5 @@ class RedisPubSub(BasePubSub):
     async def listen(self, channel_name: str):
         await self.pubsub.subscribe(channel_name)
         async for message in self.pubsub.listen():
-            print(message)
             yield message
         await self.pubsub.unsubscribe(channel_name)
