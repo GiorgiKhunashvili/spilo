@@ -19,20 +19,19 @@ class Channel:
         self.clients: Set[BaseClient] = set()
         self.dict_clients: Dict[Any, BaseClient] = {}
         self.pubsub_manager = pubsub_manager
-        self.running_task: asyncio.Task = None
+        self.receiver_task: asyncio.Task =asyncio.create_task(self.receiver())
 
     @classmethod
-    def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> Tuple["Channel", bool]:
+    def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> "Channel":
         """
         Class method for getting channel class if channel class does not exist
         method will create new one and will return from function.
         """
         if channel_name in cls.channel_cache:
-            return cls.channel_cache[channel_name], True
+            return cls.channel_cache[channel_name]
         channel = cls(channel_name, pubsub_manager)
         cls.channel_cache[channel_name] = channel
-        asyncio.create_task(self.receiver())
-        return channel, False
+        return channel
 
     def add_client(self, client: BaseClient) -> None:
         """
@@ -50,14 +49,15 @@ class Channel:
             self.clients.remove(client)
             self.dict_clients.pop(client.client_id, None)
 
-        self.cancel_receiver_task()
+        self._cleanup()
 
-    def _cancel_receiver_task(self):
+    def _cleanup(self):
         """
-        Method for canceling pubsub backend listener
+        Method for canceling pubsub backend listener and removing channel instance from channel_cache
         """
-        if len(self.clients):
-            self.running_task.cancel()
+        if len(self.clients) == 0:
+            self.receiver_task.cancel()
+            del channel_cache[self.channel_name]
 
 
     async def receiver(self):
@@ -67,8 +67,6 @@ class Channel:
         """
         async for raw in self.pubsub_manager.listen(self.channel_name):
             if raw:
-                if raw["data"] == "STOP" and len(self.clients) == 0:
-                    break
                 if raw["channel"] != self.channel_name:
                     try:
                         await self.dict_clients[raw["channel"]].send(
