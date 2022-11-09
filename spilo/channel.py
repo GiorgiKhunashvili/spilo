@@ -57,8 +57,7 @@ class Channel:
         """
         if len(self.clients) == 0:
             self.receiver_task.cancel()
-            del channel_cache[self.channel_name]
-
+            del self.__class__.channel_cache[self.channel_name]
 
     async def receiver(self):
         """

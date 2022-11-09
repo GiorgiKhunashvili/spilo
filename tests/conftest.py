@@ -1,6 +1,10 @@
+import asyncio
 import pytest
+import pytest_asyncio
 
 from spilo.base_client import BaseClient
+from spilo.channel import Channel
+from spilo.redis_pubsub import RedisPubSub
 
 
 class Client(BaseClient):
@@ -16,4 +20,11 @@ class Client(BaseClient):
 def client():
     c = Client()
     yield c
+
+
+@pytest_asyncio.fixture
+async def channel():
+    redis_pubsub = RedisPubSub()
+    channel = Channel.get("test_channel", redis_pubsub)
+    yield channel
 
