@@ -1,3 +1,4 @@
+import asyncio
 from typing import Set, Dict, Any, Tuple
 
 from .base_client import BaseClient
@@ -18,6 +19,7 @@ class Channel:
         self.clients: Set[BaseClient] = set()
         self.dict_clients: Dict[Any, BaseClient] = {}
         self.pubsub_manager = pubsub_manager
+        self.running_task: asyncio.Task = None
 
     @classmethod
     def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> Tuple["Channel", bool]:
@@ -29,6 +31,7 @@ class Channel:
             return cls.channel_cache[channel_name], True
         channel = cls(channel_name, pubsub_manager)
         cls.channel_cache[channel_name] = channel
+        asyncio.create_task(self.receiver())
         return channel, False
 
     def add_client(self, client: BaseClient) -> None:
@@ -46,6 +49,16 @@ class Channel:
             await client.close()
             self.clients.remove(client)
             self.dict_clients.pop(client.client_id, None)
+
+        self.cancel_receiver_task()
+
+    def _cancel_receiver_task(self):
+        """
+        Method for canceling pubsub backend listener
+        """
+        if len(self.clients):
+            self.running_task.cancel()
+
 
     async def receiver(self):
         """
