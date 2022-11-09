@@ -73,3 +73,4 @@ class Channel:
         Method for publishing messages to the specific channel.
         """
         await self.pubsub_manager.publish(self.channel_name, data)
+
