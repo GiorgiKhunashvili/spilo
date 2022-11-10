@@ -16,18 +16,24 @@ class RedisPubSub(BasePubSub):
             cls._singleton = super(RedisPubSub, cls).__new__(cls, *args, **kwargs)
         return cls._singleton
 
-    def __init__(self, url="redis://localhost:6379/0", redis_options=None):
+    def __init__(self, url="redis://localhost:6379/0", redis_options=None, connected_redis_inst: Redis=None):
         self.redis_url = url
         self.redis_options = redis_options or {}
-        self.redis: Redis | None = None
+        self.redis: Redis | None = connected_redis_inst
         self.pubsub: PubSub | None = None
 
     def connect(self):
-        self.redis = aioredis.Redis.from_url(
-                self.redis_url,
-                decode_responses=True,
-                **self.redis_options
-                )
+        """
+        If connected_redis_inst is provided
+        connect method will not make new connect
+        to the database and will reuse provided redis instance.
+        """
+        if self.redis is None:
+            self.redis = aioredis.Redis.from_url(
+                    self.redis_url,
+                    decode_responses=True,
+                    **self.redis_options
+                    )
         self.pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
 
     async def publish(self, channel_name: str, data):
@@ -39,7 +45,6 @@ class RedisPubSub(BasePubSub):
         await self.pubsub.subscribe(channel_name)
         async for message in self.pubsub.listen():
             yield message
-        await self.pubsub.unsubscribe(channel_name)
 
     async def unsubscribe(self, channel_name):
         """
