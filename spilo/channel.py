@@ -12,7 +12,7 @@ class Channel:
     clients will send and receive messages through channel_name.
     """
 
-    channel_cache = {}
+    _channel_cache = {}
 
     def __init__(self, channel_name: str, pubsub_manager: BasePubSub):
         self.channel_name = channel_name
@@ -27,11 +27,11 @@ class Channel:
         """
         return len(self.clients)
 
-    def __getitem__(self, channel_name):
+    def __getitem__(self, channel_name: str):
         """
         returns channel class if one exists.
         """
-        return self.channel_cache[channel_name]
+        return self._channel_cache[channel_name]
 
     @classmethod
     def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> "Channel":
@@ -39,10 +39,10 @@ class Channel:
         Class method for getting channel class if channel class does not exist
         method will create new one and will return from function.
         """
-        if channel_name in cls.channel_cache:
-            return cls.channel_cache[channel_name]
+        if channel_name in cls._channel_cache:
+            return cls._channel_cache[channel_name]
         channel = cls(channel_name, pubsub_manager)
-        cls.channel_cache[channel_name] = channel
+        cls._channel_cache[channel_name] = channel
         return channel
 
     def add_client(self, client: BaseClient) -> None:
@@ -70,7 +70,7 @@ class Channel:
         """
         if len(self.clients) == 0:
             self.receiver_task.cancel()
-            del self.__class__.channel_cache[self.channel_name]
+            del self.__class__[self.channel_name]
             await self.pubsub_manager.unsubscribe(self.channel_name)
 
     async def receiver(self):
