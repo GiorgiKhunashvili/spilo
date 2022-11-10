@@ -1,5 +1,5 @@
 import asyncio
-from typing import Set, Dict, Any, Tuple
+from typing import Set, Dict, Any
 
 from .base_client import BaseClient
 from .base_pubsub import BasePubSub
@@ -18,7 +18,7 @@ class Channel:
         self.channel_name = channel_name
         self.clients: Set[BaseClient] = set()
         self.dict_clients: Dict[Any, BaseClient] = {}
-        self.pubsub_manager = pubsub_manager
+        self.pubsub_manager: BasePubSub = pubsub_manager
         self.receiver_task: asyncio.Task =asyncio.create_task(self.receiver())
 
     @classmethod
@@ -49,19 +49,21 @@ class Channel:
             self.clients.remove(client)
             self.dict_clients.pop(client.client_id, None)
 
-        self._cleanup()
+        await self._cleanup()
 
-    def _cleanup(self):
+    async def _cleanup(self):
         """
-        Method for canceling pubsub backend listener and removing channel instance from channel_cache
+        Method for canceling pubsub backend listener and
+        removing channel instance from channel_cache
         """
         if len(self.clients) == 0:
             self.receiver_task.cancel()
             del self.__class__.channel_cache[self.channel_name]
+            await self.pubsub_manager.unsubscribe(self.channel_name)
 
     async def receiver(self):
         """
-        Method for listening pubsub backend channel 
+        Method for listening pubsub backend channel
         and sending messeges to channel clients.
         """
         async for raw in self.pubsub_manager.listen(self.channel_name):
@@ -82,4 +84,3 @@ class Channel:
         Method for publishing messages to the specific channel.
         """
         await self.pubsub_manager.publish(self.channel_name, data)
-

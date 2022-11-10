@@ -23,7 +23,11 @@ class RedisPubSub(BasePubSub):
         self.pubsub: PubSub | None = None
 
     def connect(self):
-        self.redis = aioredis.Redis.from_url(self.redis_url, decode_responses=True, **self.redis_options)
+        self.redis = aioredis.Redis.from_url(
+                self.redis_url,
+                decode_responses=True,
+                **self.redis_options
+                )
         self.pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
 
     async def publish(self, channel_name: str, data):
@@ -35,4 +39,11 @@ class RedisPubSub(BasePubSub):
         await self.pubsub.subscribe(channel_name)
         async for message in self.pubsub.listen():
             yield message
+        await self.pubsub.unsubscribe(channel_name)
+
+    async def unsubscribe(self, channel_name):
+        """
+        Method for unsubscribe specific channel this
+        prevents from getting unnecessary information.
+        """
         await self.pubsub.unsubscribe(channel_name)

@@ -25,4 +25,11 @@ class BasePubSub(ABC):
         """
         Method for listening incoming messages.
         """
+    
+    @abstractmethod
+    async def unsubscribe(self, channel_name):
+        """
+        Method for unsubscribe specific channel this
+        prevents from getting unnecessary information.
+        """
 
