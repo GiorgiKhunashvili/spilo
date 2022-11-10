@@ -20,6 +20,18 @@ class Channel:
         self.dict_clients: Dict[Any, BaseClient] = {}
         self.pubsub_manager: BasePubSub = pubsub_manager
         self.receiver_task: asyncio.Task =asyncio.create_task(self.receiver())
+    
+    def __len__(self):
+        """
+        returns active clients count.
+        """
+        return len(self.clients)
+
+    def __getitem__(self, channel_name):
+        """
+        returns channel class if one exists.
+        """
+        return self.channel_cache[channel_name]
 
     @classmethod
     def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> "Channel":
