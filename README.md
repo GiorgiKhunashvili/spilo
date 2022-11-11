@@ -12,7 +12,7 @@ $ pip install spilo
 
 Here's example of the backend code for a simple websocket server:
 
-** server.py **
+**server.py**
 
 
 ```python
