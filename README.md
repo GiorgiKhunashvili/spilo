@@ -6,5 +6,5 @@ Spilo is lightweight library for developing real time applications which helps d
 
 
 ```console
-$ pip install sqlmodel
+$ pip install spilo
 ```
