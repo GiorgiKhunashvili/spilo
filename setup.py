@@ -9,7 +9,7 @@ DESCRIPTION = "Lightweight library for developing real time applications"
 EMAIL = "gkhunashvili@icloud.com"
 AUTHOR = "Giorgi Khunashvili"
 REQUIRES_PYTHON = ">=3.6.0"
-VERSION = "0.0.8"
+VERSION = "0.0.10"
 
 # Which packages are required for this module to be executed?
 REQUIRED = [
