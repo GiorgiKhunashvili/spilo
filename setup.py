@@ -9,7 +9,7 @@ DESCRIPTION = "Lightweight library for developing real time applications"
 EMAIL = "gkhunashvili@icloud.com"
 AUTHOR = "Giorgi Khunashvili"
 REQUIRES_PYTHON = ">=3.6.0"
-VERSION = "0.0.10"
+VERSION = "0.0.11"
 
 # Which packages are required for this module to be executed?
 REQUIRED = [
@@ -41,6 +41,7 @@ else:
 setup(
     name=NAME,
     version=about["__version__"],
+    url="https://github.com/GiorgiKhunashvili/spilo",
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type="text/markdown",
