@@ -5,18 +5,14 @@ from aioredis import Redis
 from aioredis.client import PubSub
 
 from .base_pubsub import BasePubSub
+from .utils import singleton
 
 
+@singleton
 class RedisPubSub(BasePubSub):
 
-    _singleton = None
-    
-    def __new__(cls, url="redis://localhost:6379/0", redis_options=None, *args, **kwargs):
-        if not cls._singleton:
-            cls._singleton = super(RedisPubSub, cls).__new__(cls, *args, **kwargs)
-        return cls._singleton
-
     def __init__(self, url="redis://localhost:6379/0", redis_options=None, connected_redis_inst: Redis=None):
+        print("aliooo")
         self.redis_url = url
         self.redis_options = redis_options or {}
         self.redis: Redis | None = connected_redis_inst

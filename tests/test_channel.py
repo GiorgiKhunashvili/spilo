@@ -25,9 +25,3 @@ async def test_remove_client_from_channel(client, channel):
     assert len(channel.clients) == 0
     assert channel.dict_clients.get(client.client_id) is None
 
-
-@pytest.mark.asyncio
-async def test_getting_channel_with_brackets(channel):
-    exc_channel = channel["test_channel"]
-    assert exc_channel is channel
-

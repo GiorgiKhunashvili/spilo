@@ -27,12 +27,6 @@ class Channel:
         """
         return len(self.clients)
 
-    def __getitem__(self, channel_name: str):
-        """
-        returns channel class if one exists.
-        """
-        return self._channel_cache[channel_name]
-
     @classmethod
     def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> "Channel":
         """
@@ -70,7 +64,7 @@ class Channel:
         """
         if len(self.clients) == 0:
             self.receiver_task.cancel()
-            del self.__class__[self.channel_name]
+            del self.__class__._channel_cache[self.channel_name]
             await self.pubsub_manager.unsubscribe(self.channel_name)
 
     async def receiver(self):

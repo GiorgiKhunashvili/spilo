@@ -24,7 +24,7 @@ def client():
 
 @pytest_asyncio.fixture
 async def channel():
-    redis_pubsub = RedisPubSub()
+    redis_pubsub = RedisPubSub().connect()
     channel = Channel.get("test_channel", redis_pubsub)
     yield channel
 
