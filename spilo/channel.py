@@ -17,7 +17,7 @@ class Channel:
     def __init__(self, channel_name: str, pubsub_manager: BasePubSub):
         self.channel_name = channel_name
         self._clients: Set[BaseClient] = set()
-        self.__dict_clients: Dict[Any, BaseClient] = {}
+        self._dict_clients: Dict[Any, BaseClient] = {}
         self.pubsub_manager: BasePubSub = pubsub_manager
         self._receiver_task: asyncio.Task =asyncio.create_task(self.receiver())
     
@@ -31,7 +31,7 @@ class Channel:
         """
         retunrs specific client.
         """
-        return self.__dict_clients[client_id]
+        return self._dict_clients[client_id]
 
     @classmethod
     def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> "Channel":
@@ -50,7 +50,7 @@ class Channel:
         Method for adding ws clients to channel.
         """
         self._clients.add(client)
-        self.__dict_clients[client.client_id] = client
+        self._dict_clients[client.client_id] = client
 
     async def remove_client(self, client: BaseClient):
         """
