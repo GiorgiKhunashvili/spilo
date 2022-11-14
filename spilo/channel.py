@@ -16,16 +16,22 @@ class Channel:
 
     def __init__(self, channel_name: str, pubsub_manager: BasePubSub):
         self.channel_name = channel_name
-        self.clients: Set[BaseClient] = set()
-        self.dict_clients: Dict[Any, BaseClient] = {}
+        self._clients: Set[BaseClient] = set()
+        self.__dict_clients: Dict[Any, BaseClient] = {}
         self.pubsub_manager: BasePubSub = pubsub_manager
-        self.receiver_task: asyncio.Task =asyncio.create_task(self.receiver())
+        self._receiver_task: asyncio.Task =asyncio.create_task(self.receiver())
     
     def __len__(self):
         """
         returns active clients count.
         """
-        return len(self.clients)
+        return len(self._clients)
+
+    def __getitem__(self, client_id):
+        """
+        retunrs specific client.
+        """
+        return self.__dict_clients[client_id]
 
     @classmethod
     def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> "Channel":
@@ -43,17 +49,17 @@ class Channel:
         """
         Method for adding ws clients to channel.
         """
-        self.clients.add(client)
-        self.dict_clients[client.client_id] = client
+        self._clients.add(client)
+        self.__dict_clients[client.client_id] = client
 
     async def remove_client(self, client: BaseClient):
         """
         Method for removing client from channel.
         """
-        if client in self.clients:
+        if client in self._clients:
             await client.close()
-            self.clients.remove(client)
-            self.dict_clients.pop(client.client_id, None)
+            self._clients.remove(client)
+            self._dict_clients.pop(client.client_id, None)
 
         await self._cleanup()
 
@@ -62,8 +68,8 @@ class Channel:
         Method for canceling pubsub backend listener and
         removing channel instance from channel_cache
         """
-        if len(self.clients) == 0:
-            self.receiver_task.cancel()
+        if len(self._clients) == 0:
+            self._receiver_task.cancel()
             del self.__class__._channel_cache[self.channel_name]
             await self.pubsub_manager.unsubscribe(self.channel_name)
 
@@ -75,14 +81,14 @@ class Channel:
         async for raw in self.pubsub_manager.listen(self.channel_name):
             if raw["channel"] != self.channel_name:
                 try:
-                    await self.dict_clients[raw["channel"]].send(
+                    await self._dict_clients[raw["channel"]].send(
                         raw["data"]
                     )
                 except KeyError:
                     # TODO LOG SOMETHING
                     pass
             else:
-                for client in self.clients:
+                for client in self._clients:
                     await client.send(str(raw["data"]))
 
     async def publish(self, data):
