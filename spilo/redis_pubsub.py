@@ -12,7 +12,6 @@ from .utils import singleton
 class RedisPubSub(BasePubSub):
 
     def __init__(self, url="redis://localhost:6379/0", redis_options=None, connected_redis_inst: Redis=None):
-        print("aliooo")
         self.redis_url = url
         self.redis_options = redis_options or {}
         self.redis: Redis | None = connected_redis_inst
