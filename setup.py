@@ -8,8 +8,8 @@ NAME = "spilo"
 DESCRIPTION = "Lightweight library for developing real time applications"
 EMAIL = "gkhunashvili@icloud.com"
 AUTHOR = "Giorgi Khunashvili"
-REQUIRES_PYTHON = ">=3.6.0"
-VERSION = "0.0.12"
+REQUIRES_PYTHON = ">=3.7.0"
+VERSION = "0.0.13"
 
 # Which packages are required for this module to be executed?
 REQUIRED = [
@@ -53,7 +53,7 @@ setup(
     include_package_data=True,
     license="MIT",
     classifiers=[
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
     setup_requires=["wheel"],
 )
