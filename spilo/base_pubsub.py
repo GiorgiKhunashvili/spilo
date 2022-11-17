@@ -9,7 +9,7 @@ class BasePubSub(ABC):
     """
 
     @abstractmethod
-    async def connect(self):
+    def connect(self):
         """
         Method for connecting pub sub backend.
         """

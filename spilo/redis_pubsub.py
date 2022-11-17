@@ -10,8 +10,13 @@ from .utils import singleton
 
 @singleton
 class RedisPubSub(BasePubSub):
+    """
+    Class which handles redis pubsub. you can listen incomming
+    messages on specific channel and also publish messages.
+    """
 
-    def __init__(self, url="redis://localhost:6379/0", redis_options=None, connected_redis_inst: Redis=None):
+    def __init__(self, url="redis://localhost:6379/0", redis_options=None,
+                 connected_redis_inst: Redis=None):
         self.redis_url = url
         self.redis_options = redis_options or {}
         self.redis: Redis | None = connected_redis_inst
