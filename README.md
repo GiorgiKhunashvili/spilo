@@ -54,5 +54,5 @@ async def websocket_endpoint(websocket: WebSocket, channel_name: str):
             data = await websocket.receive_text()
             await channel.publish(data)
     except WebSocketDisconnect:
-        channel.remove_client(client)
+        await channel.remove_client(client)
 ```
