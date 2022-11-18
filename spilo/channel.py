@@ -57,7 +57,6 @@ class Channel:
         Method for removing client from channel.
         """
         if client in self._clients:
-            await client.close()
             self._clients.remove(client)
             self._dict_clients.pop(client.client_id, None)
 
