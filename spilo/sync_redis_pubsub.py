@@ -1,5 +1,6 @@
+import json
+
 import redis
-import pickle
 
 from .base_pubsub import BasePubSub
 
@@ -21,4 +22,4 @@ class SyncRedisPubSub(BasePubSub):
         self.redis = redis.Redis.from_url(self.url, **self.redis_options)
 
     def publish(self, channel_name: str, data):
-        self.redis.publish(channel_name, pickle.dumps(data))
+        self.redis.publish(channel_name, json.dumps(data))

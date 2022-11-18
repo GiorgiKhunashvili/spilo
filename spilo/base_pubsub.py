@@ -20,16 +20,21 @@ class BasePubSub(ABC):
         Method for publishing messages.
         """
 
+
+class BaseAsyncPubSub(BasePubSub):
+    """
+    Abstract class handling listeing incoming messages
+    """
+
     @abstractmethod
     async def listen(self, channel_name: str) -> AsyncIterable:
         """
         Method for listening incoming messages.
         """
-    
+
     @abstractmethod
     async def unsubscribe(self, channel_name):
         """
         Method for unsubscribe specific channel this
         prevents from getting unnecessary information.
         """
-

@@ -4,12 +4,12 @@ import aioredis
 from aioredis import Redis
 from aioredis.client import PubSub
 
-from .base_pubsub import BasePubSub
+from .base_pubsub import BaseAsyncPubSub
 from .utils import singleton
 
 
 @singleton
-class RedisPubSub(BasePubSub):
+class RedisPubSub(BaseAsyncPubSub):
     """
     Class which handles redis pubsub. you can listen incomming
     messages on specific channel and also publish messages.
