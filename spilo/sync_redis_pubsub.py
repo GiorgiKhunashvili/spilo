@@ -7,9 +7,9 @@ from .base_pubsub import BasePubSub
 
 class SyncRedisPubSub(BasePubSub):
     """
-    Class for handling synchronous redis pubsub
-    this class is write only which means you can only publish messages
-    this class does not provides api for listening incoming messages yet.
+    Class for handling synchronous redis pubsub.
+    This class is write only which means you can only publish messages
+    this class does not provide api for listening incoming messages yet.
     """
 
     def __init__(self, url="redis://localhost:6379/0",
@@ -20,6 +20,8 @@ class SyncRedisPubSub(BasePubSub):
 
     def connect(self):
         self.redis = redis.Redis.from_url(self.url, **self.redis_options)
+        self.redis.pubsub()
+        return self.redis
 
     def publish(self, channel_name: str, data):
         self.redis.publish(channel_name, json.dumps(data))
