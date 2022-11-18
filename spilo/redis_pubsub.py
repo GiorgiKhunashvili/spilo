@@ -1,4 +1,4 @@
-import pickle
+import json
 
 import aioredis
 from aioredis import Redis
@@ -38,7 +38,7 @@ class RedisPubSub(BasePubSub):
 
     async def publish(self, channel_name: str, data):
         return await self.redis.publish(
-            channel_name, pickle.dumps(data)
+            channel_name, json.dumps(data)
         )
 
     async def listen(self, channel_name: str):
