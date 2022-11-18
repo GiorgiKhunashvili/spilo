@@ -20,7 +20,7 @@ class Channel:
         self._dict_clients: Dict[Any, BaseClient] = {}
         self.pubsub_manager: BasePubSub = pubsub_manager
         self._receiver_task: asyncio.Task =asyncio.create_task(self.receiver())
-    
+
     def __len__(self):
         """
         returns active clients count.
@@ -80,13 +80,9 @@ class Channel:
         """
         async for raw in self.pubsub_manager.listen(self.channel_name):
             if raw["channel"] != self.channel_name:
-                try:
-                    await self._dict_clients[raw["channel"]].send(
-                        raw["data"]
-                    )
-                except KeyError:
-                    # TODO LOG SOMETHING
-                    pass
+                await self._dict_clients[raw["channel"]].send(
+                    raw["data"]
+                )
             else:
                 for client in self._clients:
                     await client.send(str(raw["data"]))
