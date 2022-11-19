@@ -1,4 +1,5 @@
 import asyncio
+import pickle
 from typing import Set, Dict, Any
 
 from .base_client import BaseClient
@@ -78,13 +79,12 @@ class Channel:
         and sending messeges to channel clients.
         """
         async for raw in self.pubsub_manager.listen(self.channel_name):
+            data = pickle.loads(raw["data"])
             if raw["channel"] != self.channel_name:
-                await self._dict_clients[raw["channel"]].send(
-                    raw["data"]
-                )
+                await self._dict_clients[raw["channel"]].send(data)
             else:
                 for client in self._clients:
-                    await client.send(str(raw["data"]))
+                    await client.send(data)
 
     async def publish(self, data):
         """

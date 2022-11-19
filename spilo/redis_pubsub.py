@@ -36,7 +36,7 @@ class RedisPubSub(BaseAsyncPubSub):
                     )
         self.pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
 
-    async def publish(self, channel_name: str, data):
+    async def publish(self, channel_name: str, data: dict):
         return await self.redis.publish(
             channel_name, json.dumps(data)
         )
