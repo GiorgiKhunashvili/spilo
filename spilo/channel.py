@@ -3,7 +3,7 @@ import pickle
 from typing import Set, Dict, Any
 
 from .base_client import BaseClient
-from .base_pubsub import BasePubSub
+from .base_pubsub import BaseAsyncPubSub
 
 
 class Channel:
@@ -15,11 +15,11 @@ class Channel:
 
     _channel_cache = {}
 
-    def __init__(self, channel_name: str, pubsub_manager: BasePubSub):
+    def __init__(self, channel_name: str, pubsub_manager: BaseAsyncPubSub):
         self.channel_name = channel_name
         self._clients: Set[BaseClient] = set()
         self._dict_clients: Dict[Any, BaseClient] = {}
-        self.pubsub_manager: BasePubSub = pubsub_manager
+        self.pubsub_manager: BaseAsyncPubSub = pubsub_manager
         self._receiver_task: asyncio.Task = asyncio.create_task(self.receiver())
 
     def __len__(self):
@@ -30,12 +30,12 @@ class Channel:
 
     def __getitem__(self, client_id):
         """
-        retunrs specific client.
+        returns specific client.
         """
         return self._dict_clients[client_id]
 
     @classmethod
-    def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> "Channel":
+    def get(cls, channel_name: str, pubsub_manager: BaseAsyncPubSub) -> "Channel":
         """
         Class method for getting channel class if channel class does not exist
         method will create new one and will return from function.
