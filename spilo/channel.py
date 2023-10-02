@@ -1,6 +1,6 @@
 import asyncio
 import pickle
-from typing import Set, Dict, Any
+from typing import Set, Dict, Any, Callable
 
 from .base_client import BaseClient
 from .base_pubsub import BaseAsyncPubSub
@@ -21,6 +21,7 @@ class Channel:
         self._dict_clients: Dict[Any, BaseClient] = {}
         self.pubsub_manager: BaseAsyncPubSub = pubsub_manager
         self._receiver_task: asyncio.Task = asyncio.create_task(self.receiver())
+        self.__events = {}
 
     def __len__(self):
         """
@@ -45,6 +46,18 @@ class Channel:
         channel = cls(channel_name, pubsub_manager)
         cls._channel_cache[channel_name] = channel
         return channel
+
+    def on(self, event_name: str = None):
+        """
+        function decorator for handling specific events
+        """
+        def decorator(func: Callable):
+            if event_name:
+                self.__events[event_name] = func
+            else:
+                self.__events[func.__name__] = func
+            return func
+        return decorator
 
     def add_client(self, client: BaseClient) -> None:
         """
