@@ -20,7 +20,7 @@ class Channel:
         self._clients: Set[BaseClient] = set()
         self._dict_clients: Dict[Any, BaseClient] = {}
         self.pubsub_manager: BasePubSub = pubsub_manager
-        self._receiver_task: asyncio.Task =asyncio.create_task(self.receiver())
+        self._receiver_task: asyncio.Task = asyncio.create_task(self.receiver())
 
     def __len__(self):
         """

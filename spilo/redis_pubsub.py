@@ -1,8 +1,7 @@
 import json
 
 import aioredis
-from aioredis import Redis
-from aioredis.client import PubSub
+from redis import asyncio as aioredis
 
 from .base_pubsub import BaseAsyncPubSub
 from .utils import singleton
@@ -11,16 +10,16 @@ from .utils import singleton
 @singleton
 class RedisPubSub(BaseAsyncPubSub):
     """
-    Class which handles redis pubsub. you can listen incomming
+    Class which handles redis pubsub. you can listen incoming
     messages on specific channel and also publish messages.
     """
 
     def __init__(self, url="redis://localhost:6379/0", redis_options=None,
-                 connected_redis_inst: Redis=None):
+                 connected_redis_inst:  aioredis.Redis = None):
         self.redis_url = url
         self.redis_options = redis_options or {}
-        self.redis: Redis | None = connected_redis_inst
-        self.pubsub: PubSub | None = None
+        self.redis: aioredis.Redis | None = connected_redis_inst
+        self.pubsub: aioredis.client.PubSub | None = None
 
     def connect(self):
         """
@@ -30,10 +29,10 @@ class RedisPubSub(BaseAsyncPubSub):
         """
         if self.redis is None:
             self.redis = aioredis.Redis.from_url(
-                    self.redis_url,
-                    decode_responses=True,
-                    **self.redis_options
-                    )
+                self.redis_url,
+                decode_responses=True,
+                **self.redis_options
+            )
         self.pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
 
     async def publish(self, channel_name: str, data: dict):
