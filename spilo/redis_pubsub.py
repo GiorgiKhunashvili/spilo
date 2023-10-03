@@ -1,7 +1,7 @@
 import json
+import asyncio
 
-import aioredis
-from redis import asyncio as aioredis
+import redis.asyncio as redis
 
 from .base_pubsub import BaseAsyncPubSub
 from .utils import singleton
@@ -15,11 +15,11 @@ class RedisPubSub(BaseAsyncPubSub):
     """
 
     def __init__(self, url="redis://localhost:6379/0", redis_options=None,
-                 connected_redis_inst:  aioredis.Redis = None):
+                 connected_redis_inst: redis.Redis = None):
         self.redis_url = url
         self.redis_options = redis_options or {}
-        self.redis: aioredis.Redis | None = connected_redis_inst
-        self.pubsub: aioredis.client.PubSub | None = None
+        self.redis: redis.Redis | None = connected_redis_inst
+        self.pubsub: redis.client.PubSub | None = None
 
     def connect(self):
         """
@@ -28,7 +28,7 @@ class RedisPubSub(BaseAsyncPubSub):
         to the database and will reuse provided redis instance.
         """
         if self.redis is None:
-            self.redis = aioredis.Redis.from_url(
+            self.redis = redis.Redis.from_url(
                 self.redis_url,
                 decode_responses=True,
                 **self.redis_options
@@ -43,6 +43,7 @@ class RedisPubSub(BaseAsyncPubSub):
     async def listen(self, channel_name: str):
         await self.pubsub.subscribe(channel_name)
         async for message in self.pubsub.listen():
+
             yield message
 
     async def unsubscribe(self, channel_name):

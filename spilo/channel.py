@@ -1,5 +1,5 @@
 import asyncio
-import pickle
+import json
 from typing import Set, Dict, Any
 
 from .base_client import BaseClient
@@ -16,7 +16,7 @@ class Channel:
 
     _channel_cache = {}
 
-    def __init__(self, channel_name: str, pubsub_manager: BaseAsyncPubSub, event_registry: EventRegistry):
+    def __init__(self, channel_name: str, pubsub_manager: BaseAsyncPubSub, event_registry: EventRegistry = None):
         self.channel_name = channel_name
         self._clients: Set[BaseClient] = set()
         self._dict_clients: Dict[Any, BaseClient] = {}
@@ -37,14 +37,14 @@ class Channel:
         return self._dict_clients[client_id]
 
     @classmethod
-    def get(cls, channel_name: str, pubsub_manager: BaseAsyncPubSub) -> "Channel":
+    def get(cls, channel_name: str, pubsub_manager: BaseAsyncPubSub, event_registry: EventRegistry = None) -> "Channel":
         """
         Class method for getting channel class if channel class does not exist
         method will create new one and will return from function.
         """
         if channel_name in cls._channel_cache:
             return cls._channel_cache[channel_name]
-        channel = cls(channel_name, pubsub_manager)
+        channel = cls(channel_name, pubsub_manager, event_registry)
         cls._channel_cache[channel_name] = channel
         return channel
 
@@ -78,15 +78,19 @@ class Channel:
     async def receiver(self):
         """
         Method for listening pubsub backend channel
-        and sending messeges to channel clients.
+        and sending messages to channel clients.
         """
         async for raw in self.pubsub_manager.listen(self.channel_name):
-            data = pickle.loads(raw["data"])
-            if raw["channel"] != self.channel_name:
-                await self._dict_clients[raw["channel"]].send(data)
+            print(raw)
+            data = json.loads(json.loads(raw["data"]))
+            print(data)
+            if self._event_registry:
+                self._event_registry.handle_event(data)
+            elif raw["channel"] != self.channel_name:
+                await self._dict_clients[raw["channel"]].send(raw)
             else:
                 for client in self._clients:
-                    await client.send(data)
+                    await client.send(raw)
 
     async def publish(self, data):
         """

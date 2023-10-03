@@ -1,7 +1,5 @@
 import pytest
 
-from spilo.channel import Channel
-
 
 def test_adding_new_client_in_channel(client, channel):
     assert len(channel) == 0

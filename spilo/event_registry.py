@@ -1,8 +1,8 @@
-from typing import Callable
+from typing import Callable, Dict
 
 
 class EventRegistry:
-    def __init__(self, event_key_name: str = "event"):
+    def __init__(self, event_key_name: str = "event_type"):
         self.event_key_name = event_key_name
         self.__events = {}
 
@@ -18,8 +18,16 @@ class EventRegistry:
             return func
         return decorator
 
-    def handle_event(self, event_name: str):
-        if event_handler := self.__events.get(event_name):
-            event_handler()
-        else:
-            raise ValueError(f"Event with name ${event_name} is not registered. Please register event.")
+    def handle_event(self, data: Dict):
+        try:
+            print("lll")
+            print(type(data))
+            print(self.event_key_name)
+            event_name = data[self.event_key_name]
+            print(event_name)
+            if event_handler := self.__events.get(event_name):
+                event_handler()
+            else:
+                raise ValueError(f"Event with name ${event_name} is not registered. Please register event.")
+        except KeyError:
+            raise KeyError(f"Can not find event key name please specify correctly")
