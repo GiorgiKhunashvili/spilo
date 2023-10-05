@@ -75,15 +75,24 @@ class Channel:
             del self.__class__._channel_cache[self.channel_name]
             await self.pubsub_manager.unsubscribe(self.channel_name)
 
+    async def listen_client(self, client: BaseClient):
+        """
+        Method which will listen websocket messages
+        """
+        try:
+            while True:
+                data = await client.listen()
+                print(data)
+        finally:
+            await self.remove_client(client)
+
     async def receiver(self):
         """
         Method for listening pubsub backend channel
         and sending messages to channel clients.
         """
         async for raw in self.pubsub_manager.listen(self.channel_name):
-            print(raw)
             data = json.loads(json.loads(raw["data"]))
-            print(data)
             if self._event_registry:
                 self._event_registry.handle_event(data)
             elif raw["channel"] != self.channel_name:

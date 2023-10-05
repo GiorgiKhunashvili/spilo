@@ -25,6 +25,9 @@ class Client(BaseClient):
     async def close(self):
         await self.protocol.close()
 
+    async def listen(self):
+        return await self.protocol.receive_text()
+
 
 @app.websocket("/ws/{channel_name}")
 async def websocket_endpoint(websocket: WebSocket, channel_name: str):
@@ -32,14 +35,9 @@ async def websocket_endpoint(websocket: WebSocket, channel_name: str):
     client = Client(protocol=websocket)
     channel = Channel.get(channel_name, redis_pubsub, event_registry)
     channel.add_client(client)
-    try:
-        while True:
-            data = await websocket.receive_text()
-            await channel.publish(data)
-    except WebSocketDisconnect:
-        await channel.remove_client(client)
+    await channel.listen_client(client)
 
 
 @event_registry.on("wuwaoba")
-def handle_wuwaoba():
+def handle_wuwaoba(client_id, data):
     print("GMERTIIII \n\n\n\n")

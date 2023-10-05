@@ -20,13 +20,9 @@ class EventRegistry:
 
     def handle_event(self, data: Dict):
         try:
-            print("lll")
-            print(type(data))
-            print(self.event_key_name)
             event_name = data[self.event_key_name]
-            print(event_name)
             if event_handler := self.__events.get(event_name):
-                event_handler()
+                event_handler(data)
             else:
                 raise ValueError(f"Event with name ${event_name} is not registered. Please register event.")
         except KeyError:
