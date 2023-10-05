@@ -83,7 +83,7 @@ class Channel:
             while True:
                 data = json.loads(await client.listen())
                 if self._event_registry:
-                    self._event_registry.handle_event(data)
+                    await self._event_registry.handle_event(client, data)
         finally:
             await self.remove_client(client)
 
@@ -93,10 +93,7 @@ class Channel:
         and sending messages to channel clients.
         """
         async for raw in self.pubsub_manager.listen(self.channel_name):
-            data = json.loads(json.loads(raw["data"]))
-            if self._event_registry:
-                self._event_registry.handle_event(data)
-            elif raw["channel"] != self.channel_name:
+            if raw["channel"] != self.channel_name:
                 await self._dict_clients[raw["channel"]].send(raw)
             else:
                 for client in self._clients:

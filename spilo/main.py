@@ -1,5 +1,6 @@
+from typing import Dict
 from dataclasses import dataclass
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket
 from .channel import Channel
 from .base_client import BaseClient
 from .redis_pubsub import RedisPubSub
@@ -38,7 +39,6 @@ async def websocket_endpoint(websocket: WebSocket, channel_name: str):
     await channel.listen_client(client)
 
 
-@event_registry.on("wuwaoba")
-def handle_wuwaoba(data):
-    print("GMERTIIII \n\n\n\n")
-    print(data)
+@event_registry.on("test")
+async def test_event_handler(client: BaseClient, data: Dict):
+    await client.send(str(data))

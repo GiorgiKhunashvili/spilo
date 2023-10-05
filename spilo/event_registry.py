@@ -1,5 +1,7 @@
 from typing import Callable, Dict
 
+from .base_client import BaseClient
+
 
 class EventRegistry:
     def __init__(self, event_key_name: str = "event_type"):
@@ -18,11 +20,11 @@ class EventRegistry:
             return func
         return decorator
 
-    def handle_event(self, data: Dict):
+    async def handle_event(self, client: BaseClient, data: Dict):
         try:
             event_name = data[self.event_key_name]
             if event_handler := self.__events.get(event_name):
-                event_handler(data)
+                await event_handler(client, data)
             else:
                 raise ValueError(f"Event with name ${event_name} is not registered. Please register event.")
         except KeyError:
