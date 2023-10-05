@@ -81,8 +81,9 @@ class Channel:
         """
         try:
             while True:
-                data = await client.listen()
-                print(data)
+                data = json.loads(await client.listen())
+                if self._event_registry:
+                    self._event_registry.handle_event(data)
         finally:
             await self.remove_client(client)
 

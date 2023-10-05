@@ -39,5 +39,6 @@ async def websocket_endpoint(websocket: WebSocket, channel_name: str):
 
 
 @event_registry.on("wuwaoba")
-def handle_wuwaoba(client_id, data):
+def handle_wuwaoba(data):
     print("GMERTIIII \n\n\n\n")
+    print(data)
