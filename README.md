@@ -16,16 +16,18 @@ Here's example of the backend code for a simple websocket server:
 
 
 ```python
+from typing import Dict
 from dataclasses import dataclass
-import uuid
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket
 from spilo.channel import Channel
 from spilo.base_client import BaseClient
 from spilo.redis_pubsub import RedisPubSub
+from spilo.event_registry import EventRegistry
 
 app = FastAPI()
 redis_pubsub = RedisPubSub()
 redis_pubsub.connect()
+event_registry = EventRegistry(event_key_name="event_type")
 
 
 @dataclass
@@ -42,17 +44,20 @@ class Client(BaseClient):
     async def close(self):
         await self.protocol.close()
 
+    async def listen(self):
+        return await self.protocol.receive_text()
+
 
 @app.websocket("/ws/{channel_name}")
 async def websocket_endpoint(websocket: WebSocket, channel_name: str):
     await websocket.accept()
     client = Client(protocol=websocket)
-    channel = Channel.get(channel_name, redis_pubsub)
+    channel = Channel.get(channel_name, redis_pubsub, event_registry)
     channel.add_client(client)
-    try:
-        while True:
-            data = await websocket.receive_text()
-            await channel.publish(data)
-    except WebSocketDisconnect:
-        await channel.remove_client(client)
+    await channel.listen_client(client)
+
+
+@event_registry.on("test")
+async def test_event_handler(client: BaseClient, data: Dict):
+    await client.send(str(data))
 ```
