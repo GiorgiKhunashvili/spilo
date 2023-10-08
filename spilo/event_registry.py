@@ -20,11 +20,11 @@ class EventRegistry:
             return func
         return decorator
 
-    async def handle_event(self, client: BaseClient, data: Dict):
+    async def handle_event(self, data: Dict, client: BaseClient, channel):
         try:
             event_name = data[self.event_key_name]
             if event_handler := self.__events.get(event_name):
-                await event_handler(client, data)
+                await event_handler(data, client, channel)
             else:
                 raise ValueError(f"Event with name ${event_name} is not registered. Please register event.")
         except KeyError:

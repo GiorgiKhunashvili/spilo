@@ -40,5 +40,6 @@ async def websocket_endpoint(websocket: WebSocket, channel_name: str):
 
 
 @event_registry.on("test")
-async def test_event_handler(client: BaseClient, data: Dict):
+async def test_event_handler(data: Dict, client: BaseClient, channel: Channel):
     await client.send(str(data))
+    await channel.publish({"event_type": "test", "data": "test_data"})
