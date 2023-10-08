@@ -19,6 +19,7 @@ Here's example of the backend code for a simple websocket server:
 from typing import Dict
 from dataclasses import dataclass
 from fastapi import FastAPI, WebSocket
+
 from spilo.channel import Channel
 from spilo.base_client import BaseClient
 from spilo.redis_pubsub import RedisPubSub
@@ -58,6 +59,7 @@ async def websocket_endpoint(websocket: WebSocket, channel_name: str):
 
 
 @event_registry.on("test")
-async def test_event_handler(client: BaseClient, data: Dict):
+async def test_event_handler(data: Dict, client: BaseClient, channel: Channel):
     await client.send(str(data))
+    await channel.publish({"event_type": "test", "data": "test_data"})
 ```
