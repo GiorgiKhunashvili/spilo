@@ -1,9 +1,10 @@
 import asyncio
-import pickle
+import json
 from typing import Set, Dict, Any
 
 from .base_client import BaseClient
-from .base_pubsub import BasePubSub
+from .base_pubsub import BaseAsyncPubSub
+from .event_registry import EventRegistry
 
 
 class Channel:
@@ -15,12 +16,13 @@ class Channel:
 
     _channel_cache = {}
 
-    def __init__(self, channel_name: str, pubsub_manager: BasePubSub):
+    def __init__(self, channel_name: str, pubsub_manager: BaseAsyncPubSub, event_registry: EventRegistry = None):
         self.channel_name = channel_name
         self._clients: Set[BaseClient] = set()
         self._dict_clients: Dict[Any, BaseClient] = {}
-        self.pubsub_manager: BasePubSub = pubsub_manager
-        self._receiver_task: asyncio.Task =asyncio.create_task(self.receiver())
+        self.pubsub_manager: BaseAsyncPubSub = pubsub_manager
+        self._receiver_task: asyncio.Task = asyncio.create_task(self.receiver())
+        self._event_registry = event_registry
 
     def __len__(self):
         """
@@ -30,19 +32,19 @@ class Channel:
 
     def __getitem__(self, client_id):
         """
-        retunrs specific client.
+        returns specific client.
         """
         return self._dict_clients[client_id]
 
     @classmethod
-    def get(cls, channel_name: str, pubsub_manager: BasePubSub) -> "Channel":
+    def get(cls, channel_name: str, pubsub_manager: BaseAsyncPubSub, event_registry: EventRegistry = None) -> "Channel":
         """
         Class method for getting channel class if channel class does not exist
         method will create new one and will return from function.
         """
         if channel_name in cls._channel_cache:
             return cls._channel_cache[channel_name]
-        channel = cls(channel_name, pubsub_manager)
+        channel = cls(channel_name, pubsub_manager, event_registry)
         cls._channel_cache[channel_name] = channel
         return channel
 
@@ -73,18 +75,29 @@ class Channel:
             del self.__class__._channel_cache[self.channel_name]
             await self.pubsub_manager.unsubscribe(self.channel_name)
 
+    async def listen_client(self, client: BaseClient):
+        """
+        Method which will listen websocket messages
+        """
+        try:
+            while True:
+                data = json.loads(await client.listen())
+                if self._event_registry:
+                    await self._event_registry.handle_event(data, client, self)
+        finally:
+            await self.remove_client(client)
+
     async def receiver(self):
         """
         Method for listening pubsub backend channel
-        and sending messeges to channel clients.
+        and sending messages to channel clients.
         """
         async for raw in self.pubsub_manager.listen(self.channel_name):
-            data = pickle.loads(raw["data"])
             if raw["channel"] != self.channel_name:
-                await self._dict_clients[raw["channel"]].send(data)
+                await self._dict_clients[raw["channel"]].send(raw["data"])
             else:
                 for client in self._clients:
-                    await client.send(data)
+                    await client.send(raw["data"])
 
     async def publish(self, data):
         """

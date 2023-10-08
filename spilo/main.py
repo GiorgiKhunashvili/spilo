@@ -1,28 +1,10 @@
-# SPILO
-
-Spilo is lightweight library for developing real time applications which helps developers managing websocket clients effectively and gives ability to scale horizontaly for handling large amount of clients.
-
-## Installation
-
-
-```console
-$ pip install spilo
-```
-
-
-Here's example of the backend code for a simple websocket server:
-
-**server.py**
-
-
-```python
 from typing import Dict
 from dataclasses import dataclass
 from fastapi import FastAPI, WebSocket
-from spilo.channel import Channel
-from spilo.base_client import BaseClient
-from spilo.redis_pubsub import RedisPubSub
-from spilo.event_registry import EventRegistry
+from .channel import Channel
+from .base_client import BaseClient
+from .redis_pubsub import RedisPubSub
+from .event_registry import EventRegistry
 
 app = FastAPI()
 redis_pubsub = RedisPubSub()
@@ -58,6 +40,6 @@ async def websocket_endpoint(websocket: WebSocket, channel_name: str):
 
 
 @event_registry.on("test")
-async def test_event_handler(client: BaseClient, data: Dict):
+async def test_event_handler(data: Dict, client: BaseClient, channel: Channel):
     await client.send(str(data))
-```
+    await channel.publish({"event_type": "test", "data": "test_data"})

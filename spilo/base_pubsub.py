@@ -23,7 +23,7 @@ class BasePubSub(ABC):
 
 class BaseAsyncPubSub(BasePubSub):
     """
-    Abstract class handling listeing incoming messages
+    Abstract class handling listening incoming messages
     """
 
     @abstractmethod

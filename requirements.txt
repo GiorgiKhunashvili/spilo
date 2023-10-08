@@ -13,3 +13,6 @@ pytest==7.2.0
 pytest-asyncio==0.20.1
 tomli==2.0.1
 typing_extensions==4.4.0
+
+redis~=5.0.1
+setuptools~=65.5.0

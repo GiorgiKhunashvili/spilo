@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 
-
 @dataclass(kw_only=True)
 class BaseClient(ABC):
     
@@ -20,3 +19,6 @@ class BaseClient(ABC):
     async def close(self):
         pass
 
+    @abstractmethod
+    async def listen(self):
+        pass
