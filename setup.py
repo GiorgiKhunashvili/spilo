@@ -13,6 +13,7 @@ VERSION = "1.0.0"
 
 # Which packages are required for this module to be executed?
 REQUIRED = [
+    "redis==5.0.1"
 ]
 
 # The rest you shouldn't have to touch too much :)
